@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Therapy — AyurSutra Prototype</title>
+
+  <!-- If you have global styles, keep link; page also contains necessary CSS -->
+  <!-- <link rel="stylesheet" href="styles.css"> -->
+
+  <style>
+    :root{
+      --bg:#ecf8f2;
+      --panel:#ffffff;
+      --muted:#6f8a81;
+      --primary:#11a85b;
+      --accent:#eaf7ef;
+      --card-radius:14px;
+      --shadow: 0 6px 20px rgba(16,32,24,0.06);
+      --soft-shadow: 0 6px 16px rgba(10,20,16,0.04);
+      --glass: linear-gradient(180deg, rgba(18,160,88,0.12), rgba(18,160,88,0.06));
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,#f7fffb, #f0fff6);}
+    .wrap{max-width:420px;margin:0 auto;padding:18px;padding-bottom:120px;box-sizing:border-box;}
+
+    /* header */
+    .header { display:flex;align-items:center;gap:12px; margin-bottom:14px; }
+    .back { font-size:20px;color:var(--muted); cursor:default; }
+    .title { font-size:20px;font-weight:800;margin:0; }
+    .subtitle { color:var(--muted); font-size:13px; margin-top:6px; }
+
+    /* progress card */
+    .progress-card {
+      background: linear-gradient(90deg,#00b26a 0%, #06c78b 100%);
+      color:#fff;
+      padding:18px;
+      border-radius:16px;
+      box-shadow:var(--shadow);
+      margin-bottom:16px;
+    }
+    .progress-row { display:flex;justify-content:space-between;align-items:center;gap:12px; }
+    .progress-left h3{margin:0;font-size:18px;font-weight:800}
+    .progress-left p{margin:6px 0 0 0;color:rgba(255,255,255,0.9);font-size:13px}
+    .progress-right{font-weight:900;font-size:32px}
+    .progress-track{background:rgba(0,0,0,0.06);height:10px;border-radius:999px;margin-top:14px;overflow:hidden}
+    .progress-bar{height:10px;background:linear-gradient(90deg,#001817,#04c77b);width:52%} /* e.g. 50% */
+
+    /* module card */
+    .card{background:var(--panel);border-radius:var(--card-radius);padding:16px;box-shadow:var(--soft-shadow);margin-bottom:16px;border:1px solid rgba(0,0,0,0.03)}
+    .card h4{margin:0 0 8px 0;font-size:16px}
+    .chart-placeholder{height:170px;border-radius:10px;background:linear-gradient(180deg,#f8fafb,#fff);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px}
+
+    /* attendance chart small */
+    .attendance { display:flex; gap:12px; align-items:center; margin-top:12px; }
+    .legend { display:flex; gap:8px; align-items:center; font-size:13px; color:var(--muted) }
+    .legend .dot { width:10px;height:10px;border-radius:4px;display:inline-block;margin-right:6px }
+    .dot-scheduled{background:#e6e9ea}
+    .dot-attended{background:var(--primary)}
+
+    /* tabs */
+    .tabs { display:flex;gap:8px;background:transparent;margin-top:14px }
+    .tab { padding:10px 14px;border-radius:999px;background:var(--panel);border:1px solid rgba(0,0,0,0.03); font-weight:700; color:var(--muted) }
+    .tab.active { background:var(--primary); color:#fff; border:none; }
+
+    /* task cards */
+    .task { display:flex; gap:12px; align-items:flex-start; padding:14px; border-radius:12px; background:linear-gradient(180deg,#f8fffa,#fff); border:1px solid rgba(0,0,0,0.03); box-shadow:var(--soft-shadow); margin-top:12px;}
+    .task .icon { width:44px; height:44px; border-radius:999px; display:flex; align-items:center; justify-content:center; font-weight:800; background:var(--primary); color:#fff; }
+    .task.done .icon{ background:rgba(0,0,0,0.06); color:var(--muted) }
+    .task .body { flex:1 }
+    .task h5{margin:0; font-weight:800}
+    .task p{margin:6px 0 0 0;color:var(--muted);font-size:14px}
+    .task .meta { display:flex; gap:12px; margin-top:10px; color:var(--muted); font-size:13px; align-items:center }
+    .start-btn { background:var(--primary); color:#fff; padding:8px 12px; border-radius:999px; font-weight:800; border:0; }
+
+    /* small ghost icon / action at right */
+    .task .action { width:36px;height:36px;border-radius:999px;background:rgba(0,0,0,0.03);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--muted) }
+
+    /* bottom nav */
+    .bottom-nav { position:fixed; left:0; right:0; bottom:0; height:72px; background:linear-gradient(180deg,#fff,#f7fff9); display:flex; align-items:center; justify-content:center; box-shadow:0 -10px 30px rgba(10,20,12,0.03) }
+    .nav-inner { max-width:420px; width:100%; display:flex; justify-content:space-around; align-items:center; gap:6px; padding:8px 14px; box-sizing:border-box;}
+    .nav-inner a { text-decoration:none;color:var(--muted); font-size:13px; display:flex;flex-direction:column; align-items:center; gap:6px; }
+    .nav-inner a.active{ color:var(--primary); font-weight:800; }
+
+    /* responsive adjustments */
+    @media (max-width:420px){
+      .wrap{padding:12px;padding-bottom:120px}
+      .progress-right{font-size:28px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <!-- header -->
+    <div class="header">
+      <div class="back">←</div>
+      <div>
+        <div class="title">Therapy Module</div>
+        <div class="subtitle">Your daily wellness journey</div>
+      </div>
+    </div>
+
+    <!-- Today's progress -->
+    <div class="progress-card" aria-hidden>
+      <div class="progress-row">
+        <div class="progress-left">
+          <h3>Today's Progress</h3>
+          <p>2 of 4 tasks completed</p>
+        </div>
+        <div class="progress-right">50%</div>
+      </div>
+
+      <div class="progress-track" aria-hidden>
+        <div class="progress-bar" style="width:50%"></div>
+      </div>
+
+      <div style="margin-top:10px;display:flex;justify-content:flex-end;color:rgba(255,255,255,0.95);font-size:13px">
+        🔥 7 day streak
+      </div>
+    </div>
+
+    <!-- Module completion -->
+    <div class="card">
+      <h4>Module Completion Progress</h4>
+      <div class="chart-placeholder" role="img" aria-label="Module progress chart">
+        <!-- static placeholder simulating chart -->
+        <div style="width:86%;height:84%;border-radius:8px;background:repeating-linear-gradient(90deg,#fff 0 1px, rgba(0,0,0,0.02) 1px 60px);opacity:0.9;display:flex;align-items:center;justify-content:center;color:var(--muted)">
+          Chart placeholder
+        </div>
+      </div>
+      <p style="margin-top:12px;color:var(--muted);font-size:13px">Complete remaining modules to unlock advanced techniques</p>
+    </div>
+
+    <!-- Weekly attendance -->
+    <div class="card" aria-hidden>
+      <h4 style="margin-bottom:8px">Weekly Session Attendance</h4>
+      <div style="display:flex;gap:14px;align-items:center;justify-content:space-between">
+        <div style="flex:1">
+          <div class="chart-placeholder" style="height:140px">Bar chart placeholder</div>
+        </div>
+        <div style="width:110px">
+          <div class="legend"><span class="dot dot-attended"></span> Attended</div>
+          <div class="legend" style="margin-top:8px"><span class="dot dot-scheduled"></span> Scheduled</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- tabs -->
+    <div class="tabs" role="tablist" aria-label="Therapy tabs">
+      <div class="tab active" role="tab">Today's Tasks</div>
+      <div class="tab" role="tab">Exercises</div>
+      <div class="tab" role="tab">Videos</div>
+    </div>
+
+    <!-- Task list (static) -->
+    <div class="task done" aria-label="Completed task">
+      <div class="icon">✓</div>
+      <div class="body">
+        <h5 style="text-decoration:line-through;color:var(--muted)">Morning Pranayama</h5>
+        <p>Deep breathing exercises to start your day</p>
+        <div class="meta">
+          <div>⏱ 10 min</div>
+          <div>🔥 7 days</div>
+        </div>
+      </div>
+      <div class="action" title="Completed">✓</div>
+    </div>
+
+    <div class="task" aria-label="Medicine task">
+      <div class="icon" style="background:#eef2f3;color:var(--muted)">⚪</div>
+      <div class="body">
+        <h5>Ashwagandha Intake</h5>
+        <p>Take 500mg with warm milk</p>
+        <div class="meta">
+          <div>⏱ 2 min</div>
+          <div>⏰ 8:00 AM</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+        <button class="start-btn">Start</button>
+      </div>
+    </div>
+
+    <div class="task done" aria-label="Oil pulling done">
+      <div class="icon">✓</div>
+      <div class="body">
+        <h5 style="text-decoration:line-through;color:var(--muted)">Oil Pulling</h5>
+        <p>Swish sesame oil for oral health</p>
+        <div class="meta">
+          <div>⏱ 15 min</div>
+          <div>🔥 5 days</div>
+        </div>
+      </div>
+      <div class="action">♡</div>
+    </div>
+
+    <div class="task" aria-label="Evening meditation">
+      <div class="icon" style="background:#eef2f3;color:var(--muted)">⚪</div>
+      <div class="body">
+        <h5>Evening Meditation</h5>
+        <p>Mindfulness meditation session</p>
+        <div class="meta">
+          <div>⏱ 20 min</div>
+          <div>⏰ 7:00 PM</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+        <button class="start-btn">Start</button>
+      </div>
+    </div>
+
+    <div style="height:22px"></div>
+  </div>
+
+  <!-- bottom navigation -->
+  <div class="bottom-nav" role="navigation" aria-label="Primary">
+    <div class="nav-inner">
+      <a href="home.html" aria-label="Home">♡<span style="font-size:12px">Home</span></a>
+      <a href="book.html" aria-label="Book">📅<span style="font-size:12px">Book</span></a>
+      <a href="therapy.html" class="active" aria-label="Therapy">📚<span style="font-size:12px">Therapy</span></a>
+      <a href="profile.html" aria-label="Profile">⚕️<span style="font-size:12px">Profile</span></a>
+    </div>
+  </div>
+</body>
+</html>

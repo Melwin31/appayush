@@ -1,0 +1,184 @@
+:root{
+  --bg: #f4fdf9;
+  --panel: #ffffff;
+  --muted: #6b7b72;
+  --text: #12221b;
+  --primary: #08a162;
+  --accent: #eaf6ee;
+  --card-radius: 16px;
+  --shadow: 0 14px 30px rgba(34,50,40,0.06);
+  --soft-shadow: 0 6px 18px rgba(34,50,40,0.04);
+  --pill-bg: #f3fbf7;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family: Inter, "Segoe UI", Roboto, system-ui, Arial;
+  background: linear-gradient(180deg, #f7fffb 0%, #f0fff7 100%);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+/* page container (mobile width prototype) */
+.container {
+  max-width:420px;
+  margin:0 auto;
+  padding:18px 18px 92px; /* bottom space for nav */
+}
+
+/* header row */
+.header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:12px;
+}
+.profile-info{
+  display:flex;
+  gap:12px;
+  align-items:center;
+}
+.avatar{
+  width:48px;height:48px;border-radius:50%;
+  background:linear-gradient(180deg,#e6f9f0,#d1f1de);
+  display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--primary);
+  box-shadow:var(--soft-shadow);
+}
+.greeting small { display:block; color:var(--muted); font-size:13px; }
+.greeting strong { display:block; font-size:16px; margin-top:4px; }
+
+/* wellness card */
+.wellness {
+  margin-top:8px;
+  background: linear-gradient(90deg, #06b372 0%, #08a162 100%);
+  color: #fff;
+  padding:18px;
+  border-radius:14px;
+  box-shadow:var(--shadow);
+}
+.well-header { display:flex; justify-content:space-between; align-items:flex-start; gap:10px }
+.well-title { font-weight:700; font-size:18px; margin:0; }
+.well-sub { font-size:13px; opacity:0.95; margin-top:6px; color: rgba(255,255,255,0.92); }
+.well-score { text-align:right; }
+.well-score b { font-size:34px; display:block; }
+.well-progress {
+  margin-top:14px;
+  height:12px;
+  background: rgba(0,0,0,0.08);
+  border-radius:8px; overflow:hidden;
+  position:relative;
+}
+.well-progress .inner {
+  height:100%;
+  width:74%;
+  background: linear-gradient(90deg,#001418,#00c57c);
+  border-radius:8px;
+  box-shadow: inset 0 -8px 0 rgba(255,255,255,0.02);
+}
+
+/* quick actions row */
+.quick-actions {
+  display:flex;
+  gap:12px;
+  margin-top:14px;
+}
+.action {
+  flex:1;
+  background:var(--panel);
+  padding:14px;
+  border-radius:12px;
+  box-shadow:var(--soft-shadow);
+  text-align:center;
+  cursor:pointer;
+  border:1px solid rgba(0,0,0,0.03);
+}
+.action svg { display:block; margin:0 auto 6px; }
+
+/* section title */
+.section-title { margin:22px 0 10px; font-weight:700; font-size:18px; }
+
+/* progress card (chart placeholder) */
+.card {
+  background:var(--panel);
+  border-radius:12px;
+  padding:14px;
+  box-shadow:var(--soft-shadow);
+  border:1px solid rgba(0,0,0,0.02);
+}
+.chart-placeholder {
+  height:160px;
+  border-radius:8px;
+  background:linear-gradient(180deg,#fafcfb,#fff);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--muted);
+  border:1px dashed rgba(0,0,0,0.04);
+}
+
+/* vitals list */
+.vitals { margin-top:14px; }
+.vital-row { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid rgba(0,0,0,0.03); }
+.vital-label { flex:1; font-weight:600; color:var(--muted); }
+.vital-value { width:56px; text-align:right; font-weight:700; color:var(--muted); }
+.vital-bar { width:170px; height:10px; background:#eef2ef; border-radius:999px; overflow:hidden; margin-left:8px; }
+.vital-fill { height:100%; border-radius:999px; }
+
+/* appointment card */
+.appt { margin-top:18px; display:flex; gap:12px; align-items:center; padding:12px; border-radius:12px; background:var(--panel); box-shadow:var(--soft-shadow); border:1px solid rgba(0,0,0,0.02); }
+.appt .icon { width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#eef7ff,#eef9ff); color:#2f6da6; }
+.appt .meta { flex:1; }
+.appt .tag { padding:6px 10px; border-radius:999px; background:#eef6ff; color:#2f6da6; font-weight:700; font-size:12px; }
+
+/* recommended list */
+.recommended { margin-top:14px; display:flex; flex-direction:column; gap:12px; }
+.reco-item {
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:12px; border-radius:12px; background:var(--panel); box-shadow:var(--soft-shadow); border:1px solid rgba(0,0,0,0.02);
+}
+.reco-left { display:flex; gap:12px; align-items:center; }
+.thumb { width:56px;height:56px;border-radius:10px;background:linear-gradient(90deg,#f5f7ed,#fff); display:flex;align-items:center;justify-content:center; color:var(--primary); font-weight:700; }
+.reco-info { }
+.reco-title { font-weight:700; }
+.reco-meta { color:var(--muted); font-size:13px; margin-top:6px; }
+.reco-price { color:var(--primary); font-weight:800; }
+.book-btn { background:var(--primary); color:#fff; padding:8px 12px; border-radius:999px; font-weight:700; border:0 }
+
+/* wellness tip banner */
+.tip {
+  margin-top:18px;
+  padding:14px;
+  border-radius:12px;
+  background:linear-gradient(90deg,#6ef0c3,#7bd6ff 70%);
+  color:#fff;
+  box-shadow:var(--shadow);
+}
+
+/* bottom nav */
+.bottom-nav {
+  position:fixed;
+  left:0; right:0; bottom:12px;
+  display:flex; justify-content:center;
+  pointer-events:none;
+}
+.nav-wrap {
+  width:420px; max-width:95%;
+  pointer-events:auto;
+}
+.nav {
+  display:flex; justify-content:space-around; align-items:center;
+  gap:12px; padding:10px; border-radius:999px; background:var(--panel); box-shadow:var(--shadow);
+  border:1px solid rgba(0,0,0,0.03);
+}
+.nav a { text-decoration:none; color:var(--muted); font-weight:600; font-size:13px; text-align:center; padding:6px; }
+.nav a.active{ color:var(--primary); }
+
+/* responsive tweaks */
+@media (max-width:440px){
+  .container { padding:14px 12px 120px; max-width:100%;}
+  .chart-placeholder{ height:140px; }
+  .vital-bar{ width:140px; }
+  .well-progress .inner { width:74%; } /* keep same */
+}

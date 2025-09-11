@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Protocols — AyurSutra Phone Prototype</title>
+<style>
+  :root{
+    --bg-start:#f3fbf9;
+    --bg-end:#eefbf6;
+    --phone-bg: linear-gradient(180deg,#f7faf8,#fbfffd);
+    --panel:#ffffff;
+    --muted:#6f8a81;
+    --muted-2:#98a7a0;
+    --primary:#08b77f;
+    --accent:#eaf7ef;
+    --danger:#ef6a5a;
+    --card-radius:14px;
+    --soft-shadow: 0 10px 30px rgba(8,24,20,0.06);
+    --inner-shadow: 0 6px 16px rgba(10,20,16,0.04);
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+  }
+
+  /* page background */
+  html,body{
+    height:100%;
+    margin:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background: linear-gradient(180deg,var(--bg-start),var(--bg-end));
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    color:#07221a;
+    padding:28px;
+    box-sizing:border-box;
+  }
+
+  /* phone stage */
+  .stage { width:100%; max-width:420px; display:flex; justify-content:center; }
+  .phone {
+    width:360px;
+    height:760px;
+    border-radius:34px;
+    background: var(--phone-bg);
+    box-shadow: 0 30px 60px rgba(8,24,20,0.14);
+    border: 1px solid rgba(0,0,0,0.03);
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+  }
+
+  /* screen (scrollable) */
+  .screen {
+    padding:16px;
+    box-sizing:border-box;
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.3));
+  }
+
+  /* header */
+  .header { display:flex; justify-content:space-between; align-items:center; gap:10px; }
+  .back {
+    width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center;
+    background:var(--panel); box-shadow:var(--inner-shadow); border:1px solid rgba(0,0,0,0.03);
+    cursor:pointer; font-weight:800; color:var(--muted);
+  }
+  .title-wrap { display:flex; flex-direction:column; gap:3px; }
+  .title { font-size:18px; font-weight:800; margin:0; color:#0f2a26; }
+  .subtitle { font-size:12px; color:var(--muted); margin:0; }
+
+  /* card base */
+  .card {
+    background:var(--panel);
+    border-radius:12px;
+    padding:12px;
+    box-shadow:var(--inner-shadow);
+    border:1px solid rgba(0,0,0,0.03);
+  }
+
+  /* protocol article */
+  .protocol { margin-bottom:10px; border-radius:12px; padding:12px; background:linear-gradient(180deg,#fff,#fbfffb); }
+  .protocol h3 { margin:0 0 6px 0; font-size:16px; font-weight:800; color:#0f2a26; }
+  .protocol p { margin:0 0 10px 0; color:var(--muted); font-size:13px; line-height:1.4; }
+
+  .section-title { font-size:13px; font-weight:800; color:#0f2a26; margin-top:8px; margin-bottom:6px; }
+
+  ol.small-list, ul.small-list { margin:6px 0 0 16px; padding:0; color:var(--muted); font-size:13px; line-height:1.45; }
+  ol.small-list li, ul.small-list li { margin:8px 0; }
+
+  /* precautions callout */
+  .precautions {
+    background: linear-gradient(180deg,#fff7f5,#fff9f8);
+    border-left:4px solid rgba(239,106,90,0.14);
+    padding:10px 12px;
+    border-radius:8px;
+    margin-top:6px;
+  }
+  .precautions strong { display:block; margin-bottom:6px; color:#7b2f28; }
+
+  /* actions */
+  .view-actions { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .btn {
+    padding:8px 12px; border-radius:10px; border:0; cursor:pointer; font-weight:800; font-size:13px;
+  }
+  .btn-primary { background: linear-gradient(180deg,var(--primary), #06c78b); color:#fff; box-shadow: 0 8px 18px rgba(8,183,127,0.08); }
+  .btn-outline { background:transparent; border:1px solid rgba(8,183,127,0.12); color:var(--primary); }
+  .btn-ghost { background:#f6faf8; color:var(--muted); border:1px solid rgba(0,0,0,0.03); }
+
+  .anchor { color:var(--primary); text-decoration:none; font-weight:800; }
+  .note { color:var(--muted); font-size:12px; margin-top:6px; }
+
+  /* footer with pill logo */
+  .phone-footer {
+    height:68px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.6));
+    border-top: 1px solid rgba(0,0,0,0.02);
+  }
+  .footer-pill {
+    width:72px;
+    height:36px;
+    border-radius:20px;
+    background:rgba(8,183,127,0.06);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow: 0 6px 14px rgba(8,183,127,0.04);
+  }
+  .logo-svg { width:20px; height:20px; display:block; }
+
+  /* ensure good focus outlines for keyboard use */
+  a:focus, button:focus, .back:focus { outline:3px solid rgba(8,167,118,0.12); outline-offset:3px; }
+
+  @media (max-width:380px){
+    .phone { width:340px; height:720px; }
+  }
+</style>
+</head>
+<body>
+  <div class="stage" role="main" aria-label="Phone prototype">
+    <div class="phone" role="application" aria-label="AyurSutra phone">
+
+      <!-- scrollable screen -->
+      <div class="screen" id="screen">
+
+        <!-- header -->
+        <div class="header">
+          <div class="back" onclick="location.href='therapy.html'" aria-label="Back">←</div>
+          <div class="title-wrap">
+            <div class="title">Protocols</div>
+            <div class="subtitle">Full procedure details & precautions</div>
+          </div>
+          <div style="width:40px; height:40px; border-radius:10px; background:#fff; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 14px rgba(6,119,127,0.06); color:var(--primary); font-weight:800;" id="miniBadge">M</div>
+        </div>
+
+        <!-- Abhyanga -->
+        <article id="abhyanga" class="card protocol" aria-labelledby="abhyangaTitle">
+          <h3 id="abhyangaTitle">Abhyanga — Oil Massage</h3>
+          <p>Abhyanga is a warm oil full-body massage traditionally performed by a trained therapist. It helps improve circulation, lubricate joints and calm the nervous system.</p>
+
+          <div class="section-title">Steps</div>
+          <ol class="small-list">
+            <li>Consultation & pulse check to determine oil choice.</li>
+            <li>Warm the medicated oil to a comfortable temperature.</li>
+            <li>Long, even strokes applied from distal to proximal areas for 30–60 minutes.</li>
+            <li>Finish with a short rest period and gentle warm bath if recommended.</li>
+          </ol>
+
+          <div class="section-title">Precautions & Contraindications</div>
+          <div class="precautions" aria-labelledby="prec-abhyanga">
+            <strong id="prec-abhyanga">Important precautions</strong>
+            <ul class="small-list">
+              <li>Avoid on open wounds, skin infections or fevers.</li>
+              <li>Use caution and lighter pressure for people with uncontrolled hypertension.</li>
+              <li>Pregnant users should consult practitioner for safe oil & pressure modifications.</li>
+              <li>Stop immediately if dizziness or severe discomfort occurs.</li>
+            </ul>
+          </div>
+
+          <div class="view-actions">
+            <button class="btn btn-primary" onclick="alert('Mock: start Abhyanga session')">Start Session</button>
+            <button class="btn btn-outline" onclick="location.hash='precautions'; scrollToHash()">See Precautions</button>
+            <button class="btn btn-ghost" onclick="copyLink('#abhyanga')">Copy Link</button>
+          </div>
+        </article>
+
+        <!-- Shirodhara -->
+        <article id="shirodhara" class="card protocol" aria-labelledby="shirodharaTitle">
+          <h3 id="shirodharaTitle">Shirodhara</h3>
+          <p>Continuous warm oil poured on the forehead to reduce stress and improve sleep quality.</p>
+
+          <div class="section-title">Steps</div>
+          <ol class="small-list">
+            <li>Lay the client supine and position the dhara setup above the forehead.</li>
+            <li>Warm oil and start a gentle continuous stream for 20–40 minutes.</li>
+            <li>Finish with gentle head massage and rest.</li>
+          </ol>
+
+          <div class="section-title">Precautions</div>
+          <div class="precautions" aria-labelledby="prec-shirodhara">
+            <strong id="prec-shirodhara">Caution</strong>
+            <ul class="small-list">
+              <li>Not recommended for those with head injuries, active migraines without practitioner clearance.</li>
+              <li>Check for allergies to oils used. </li>
+              <li>Avoid immediately after heavy meals — wait 60–90 minutes.</li>
+            </ul>
+          </div>
+
+          <div class="view-actions">
+            <button class="btn btn-primary" onclick="alert('Mock: view Shirodhara notes')">View Therapist Notes</button>
+            <button class="btn btn-outline" onclick="location.hash='precautions'; scrollToHash()">All Precautions</button>
+            <button class="btn btn-ghost" onclick="copyLink('#shirodhara')">Copy Link</button>
+          </div>
+        </article>
+
+        <!-- Dinacharya -->
+        <article id="dinacharya" class="card protocol" aria-labelledby="dinacharyaTitle">
+          <h3 id="dinacharyaTitle">Dinacharya — Daily Routine</h3>
+          <p>Personalized daily practices (cleansing, oil pulling, breathing & evening routine) to support balance.</p>
+
+          <div class="section-title">Recommended Routine</div>
+          <ol class="small-list">
+            <li>Wake before sunrise, drink warm water, perform tongue scraping.</li>
+            <li>Abhyanga (short self-massage) followed by a warm shower.</li>
+            <li>Regular meal times aligned to digestion strength (Agni).</li>
+            <li>Evening wind-down: light stretching, meditation and consistent sleep time.</li>
+          </ol>
+
+          <div class="section-title">Precautions</div>
+          <div class="precautions" aria-labelledby="prec-dinacharya">
+            <strong id="prec-dinacharya">Personalization</strong>
+            <ul class="small-list">
+              <li>Personalize timing and intensity per practitioner guidance.</li>
+              <li>Those with specific chronic illnesses should follow practitioner adjustments.</li>
+            </ul>
+          </div>
+
+          <div class="view-actions">
+            <button class="btn btn-primary" onclick="alert('Mock: save daily routine')">Save Routine</button>
+            <button class="btn btn-outline" onclick="location.hash='precautions'; scrollToHash()">All Precautions</button>
+            <button class="btn btn-ghost" onclick="copyLink('#dinacharya')">Copy Link</button>
+          </div>
+        </article>
+
+        <!-- General precautions -->
+        <section id="precautions" class="card protocol" aria-labelledby="precautionsTitle">
+          <h3 id="precautionsTitle">General Precautions</h3>
+          <p>Before any therapy, consider these general safety rules and share your medical details with the practitioner.</p>
+
+          <div class="section-title">When to avoid or modify therapy</div>
+          <ul class="small-list">
+            <li>Active infection, fever, or contagious illness — postpone therapy.</li>
+            <li>Severe uncontrolled BP or heart disease — seek medical clearance.</li>
+            <li>Pregnancy — only practitioner-approved techniques and oil choices.</li>
+            <li>Recent surgery or fractures — avoid area until healed.</li>
+            <li>Known allergies to herbs or oils — patch-test or avoid.</li>
+          </ul>
+
+          <div class="section-title">Practical tips</div>
+          <ul class="small-list">
+            <li>Inform therapist of medications and pre-existing conditions.</li>
+            <li>Hydrate gently before and after sessions (warm water preferred).</li>
+            <li>Allow 20–60 minutes rest after deep therapies before strenuous activity.</li>
+          </ul>
+        </section>
+
+        <div style="height:18px"></div>
+      </div> <!-- .screen -->
+
+      <!-- footer pill logo -->
+      <div class="phone-footer" aria-hidden="true">
+        <div class="footer-pill" title="AyurSutra home" onclick="location.href='home.html'" style="cursor:pointer">
+          <svg class="logo-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path fill="#08b77f" d="M12 2C9.8 6 6 9 3.5 11.5 5.7 14.7 9.7 18 14 18c2.2 0 4.5-.8 6.5-2.4C18.8 12 15.6 5.4 12 2z"/>
+            <path fill="#06a96b" d="M7 17c1.7 0 3.8-.8 5.5-2.1C15.1 13.8 16 12.2 16 11c-2.1.6-4.6-1.1-6-3.5-2 1.8-4 5-3 9z" opacity="0.95"/>
+          </svg>
+        </div>
+      </div>
+
+    </div> <!-- .phone -->
+  </div> <!-- .stage -->
+
+<script>
+  // set initial badge from localStorage if available
+  document.addEventListener('DOMContentLoaded', ()=> {
+    try {
+      const saved = JSON.parse(localStorage.getItem('ayur_user')||'{}');
+      if(saved && saved.name) document.getElementById('miniBadge').textContent = saved.name.trim().charAt(0).toUpperCase();
+    } catch(e){}
+    // if hash present, scroll into view inside the phone screen
+    if(location.hash){
+      setTimeout(()=> scrollToHash(), 200);
+    }
+  });
+
+  function scrollToHash(){
+    const h = location.hash;
+    if(!h) return;
+    const el = document.querySelector(h);
+    if(!el) return;
+    // scroll element into view inside our screen container
+    const screen = document.getElementById('screen');
+    const rect = el.getBoundingClientRect();
+    const screenRect = screen.getBoundingClientRect();
+    const offset = rect.top - screenRect.top - (screenRect.height/6);
+    screen.scrollBy({ top: offset, behavior: 'smooth' });
+    // quick highlight
+    el.style.transition = 'box-shadow 500ms, transform 500ms';
+    el.style.boxShadow = '0 10px 30px rgba(10,120,90,0.08)';
+    el.style.transform = 'translateY(-2px)';
+    setTimeout(()=>{ el.style.boxShadow=''; el.style.transform=''; }, 1200);
+  }
+
+  function copyLink(anchor){
+    const url = location.href.split('#')[0] + anchor;
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(url).then(()=> alert('Link copied to clipboard'));
+    } else {
+      prompt('Copy this link', url);
+    }
+  }
+</script>
+</body>
+</html>

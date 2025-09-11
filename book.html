@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>My Appointments — AyurSutra (Phone)</title>
+<style>
+  :root{
+    --bg-start:#f3fbf9;
+    --bg-end:#eefbf6;
+    --phone-w:360px;
+    --phone-h:760px;
+    --phone-bg: linear-gradient(180deg,#f7faf8,#fbfffd);
+    --card:#ffffff;
+    --muted:#6f8a81;
+    --accent:#08b77f;
+    --accent-2:#00b26a;
+    --danger:#e54b4b;
+    --glass: rgba(255,255,255,0.9);
+    --rounded:14px;
+    --soft-shadow: 0 20px 48px rgba(8,24,20,0.08);
+    --inner-shadow: 0 6px 18px rgba(10,20,16,0.04);
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Helvetica Neue";
+  }
+
+  /* page + phone frame */
+  html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-start),var(--bg-end));display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box}
+  .stage{width:100%;max-width:420px;display:flex;justify-content:center}
+  .phone{width:var(--phone-w);height:var(--phone-h);border-radius:34px;background:var(--phone-bg);box-shadow:var(--soft-shadow);border:1px solid rgba(0,0,0,0.03);overflow:hidden;display:flex;flex-direction:column}
+
+  /* scrollable screen */
+  .screen{padding:14px;flex:1;display:flex;flex-direction:column;gap:12px;overflow-y:auto;-webkit-overflow-scrolling:touch;background:linear-gradient(180deg, rgba(255,255,255,0.86), rgba(255,255,255,0.45))}
+  .screen::-webkit-scrollbar{ width:8px }
+  .screen::-webkit-scrollbar-thumb{ background: linear-gradient(180deg, rgba(0,0,0,0.12), rgba(0,0,0,0.06)); border-radius:999px; border:2px solid rgba(255,255,255,0.85) }
+  .screen::-webkit-scrollbar-track{ background:transparent }
+
+  /* header */
+  .head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .btn-ghost{width:40px;height:40px;border-radius:12px;background:var(--glass);display:inline-flex;align-items:center;justify-content:center;box-shadow:var(--inner-shadow);border:1px solid rgba(0,0,0,0.03);cursor:pointer;font-weight:800}
+  .title-block{flex:1;padding-left:8px;overflow:hidden}
+  .title{font-weight:900;font-size:18px;color:#07221a;line-height:1}
+  .subtitle{font-size:12px;color:var(--muted);margin-top:4px}
+
+  /* search + filters */
+  .search-row{display:flex;gap:10px;align-items:center}
+  .search-box{flex:1;background:var(--card);border-radius:12px;padding:10px 12px;display:flex;gap:10px;align-items:center;box-shadow:var(--inner-shadow);border:1px solid rgba(0,0,0,0.03)}
+  .search-box input{border:0;outline:none;background:transparent;font-size:14px;color:#07221a;flex:1}
+  .filter-btn{width:40px;height:40px;border-radius:10px;background:var(--glass);display:inline-flex;align-items:center;justify-content:center;box-shadow:var(--inner-shadow);border:1px solid rgba(0,0,0,0.03);cursor:pointer}
+
+  .chips{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+  .chip{padding:8px 12px;border-radius:999px;background:var(--card);border:1px solid rgba(0,0,0,0.03);color:var(--muted);font-weight:800;box-shadow:var(--inner-shadow);cursor:pointer;font-size:13px}
+  .chip.active{background:var(--accent);color:#fff;box-shadow:0 10px 28px rgba(8,183,127,0.08)}
+
+  /* hero appointment */
+  .appt-card{background:linear-gradient(135deg,var(--accent),var(--accent-2));padding:14px;border-radius:16px;color:#fff;box-shadow:0 12px 28px rgba(8,24,20,0.08);display:flex;gap:12px;align-items:flex-start}
+  .appt-avatar{width:72px;height:72px;border-radius:999px;background:rgba(255,255,255,0.12);flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;border:4px solid rgba(255,255,255,0.06)}
+  .appt-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+  .appt-info{flex:1;min-width:0}
+  .doctor-name{font-weight:900;font-size:16px;margin:0}
+  .doctor-role{font-weight:700;opacity:0.95;margin-top:6px;font-size:13px}
+  .appt-rating{margin-top:8px;font-weight:800}
+  .session-box{margin-top:12px;background:rgba(255,255,255,0.12);padding:10px;border-radius:12px;font-weight:900;box-shadow:inset 0 1px 0 rgba(255,255,255,0.04)}
+  .session-meta{margin-top:8px;font-weight:700;opacity:0.95;font-size:13px}
+  .actions-row{display:flex;gap:10px;margin-top:12px}
+  .btn{flex:1;padding:10px;border-radius:12px;font-weight:900;cursor:pointer;border:0}
+  .btn-reschedule{background:rgba(255,255,255,0.14);color:#fff}
+  .btn-cancel{background:var(--danger);color:#fff;box-shadow:0 8px 18px rgba(229,75,75,0.08)}
+
+  /* upcoming & history */
+  .section-title{font-weight:900;font-size:16px;margin-top:6px;color:#07221a;display:flex;align-items:center;justify-content:space-between}
+  .up-card{display:flex;gap:12px;background:var(--card);padding:12px;border-radius:12px;border:1px solid rgba(0,0,0,0.03);box-shadow:var(--inner-shadow);align-items:flex-start}
+  .up-avatar{width:48px;height:48px;border-radius:999px;background:#f2fbf8;flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center}
+  .up-avatar img{width:100%;height:100%;object-fit:cover}
+  .up-body{flex:1;min-width:0}
+  .up-name{font-weight:900}
+  .up-role{color:var(--accent-2);font-weight:800;font-size:13px;margin-top:4px}
+  .up-title{font-weight:800;margin-top:8px}
+  .meta-row{display:flex;gap:10px;color:var(--muted);font-size:13px;margin-top:8px;flex-wrap:wrap}
+  .status-pill{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;font-weight:800;font-size:12px;background:#eef7ff;color:#2a73d6;border:1px solid rgba(42,115,214,0.08)}
+  .status-confirm{background:#e6f7ed;color:#157f3e;border:1px solid rgba(21,127,62,0.06)}
+
+  .view-all{color:var(--accent-2);font-weight:900;text-decoration:none}
+
+  /* history */
+  .hist-card{display:flex;gap:12px;background:var(--card);padding:12px;border-radius:12px;border:1px solid rgba(0,0,0,0.03);box-shadow:var(--inner-shadow);align-items:flex-start}
+  .hist-avatar{width:44px;height:44px;border-radius:12px;overflow:hidden;background:#f7fbfa;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .hist-avatar img{width:100%;height:100%;object-fit:cover}
+  .hist-body{flex:1;min-width:0}
+  .hist-title{font-weight:900;margin:0;font-size:15px;color:#07221a}
+  .hist-service{font-weight:800;color:#1b7b56;margin-top:4px;font-size:13px}
+  .hist-sub{color:var(--muted);font-size:13px;margin-top:8px}
+  .hist-right{text-align:right;min-width:86px}
+  .hist-price{font-weight:900;color:var(--accent);font-size:16px}
+  .hist-status{background:#eef1f3;color:#5b6a66;padding:6px 10px;border-radius:8px;font-weight:700;border:1px solid rgba(0,0,0,0.03);display:inline-flex;align-items:center}
+
+  /* bottom nav */
+  .footer{padding:10px;background:linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,255,255,0.9));border-top:1px solid rgba(0,0,0,0.02)}
+  .nav-pill{width:100%;max-width:320px;background:var(--card);margin:0 auto;border-radius:28px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;box-shadow:var(--soft-shadow);border:1px solid rgba(0,0,0,0.03)}
+  .nav-pill a{color:var(--muted);text-decoration:none;display:flex;flex-direction:column;align-items:center;font-weight:800;font-size:12px}
+  .nav-pill a.active{color:var(--accent)}
+
+  /* responsive */
+  @media (max-width:360px){ .phone{width:340px;height:700px} .appt-avatar{width:66px;height:66px} }
+</style>
+</head>
+<body>
+  <div class="stage" role="main" aria-label="Phone prototype">
+    <div class="phone" role="region" aria-label="App phone">
+      <div class="screen">
+
+        <!-- header -->
+        <div class="head">
+          <button class="btn-ghost" title="Back" onclick="history.back()">←</button>
+          <div class="title-block" aria-hidden>
+            <div class="title">My Appointments</div>
+            <div class="subtitle">Manage your wellness sessions</div>
+          </div>
+          <button class="btn-ghost" title="Export" onclick="alert('Export (mock)')">⬇︎</button>
+        </div>
+
+        <!-- search + filter row -->
+        <div>
+          <div class="search-row">
+            <div class="search-box" role="search">
+              <svg width="16" height="16" viewBox="0 0 24 24" style="opacity:.7"><path d="M21 21l-4.35-4.35" stroke="#6f8a81" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="11" cy="11" r="6" stroke="#6f8a81" stroke-width="1.6"/></svg>
+              <input id="searchInput" type="search" placeholder="Search doctor or therapy name..." aria-label="Search doctor or therapy">
+              <button id="clearBtn" title="Clear" style="background:none;border:0;cursor:pointer;font-weight:800;color:var(--muted);display:none">✕</button>
+            </div>
+            <button class="filter-btn" title="Advanced filters" onclick="alert('Advanced filters (mock)')">≡</button>
+          </div>
+
+          <div class="chips" role="list" id="filterChips">
+            <div class="chip active" data-filter="all" role="button">All</div>
+            <div class="chip" data-filter="completed" role="button">Completed</div>
+            <div class="chip" data-filter="upcoming" role="button">Upcoming</div>
+            <div class="chip" data-filter="confirmed" role="button">Confirmed</div>
+            <div class="chip" data-filter="cancelled" role="button">Cancelled</div>
+          </div>
+        </div>
+
+        <!-- hero appointment -->
+        <section class="appt-card" aria-labelledby="current-appointment">
+          <div class="appt-avatar" aria-hidden>
+            <img src="https://via.placeholder.com/150" alt="Dr Priya">
+          </div>
+
+          <div class="appt-info">
+            <div class="doctor-name">Dr. Priya Sharma</div>
+            <div class="doctor-role">Panchakarma Specialist</div>
+            <div class="appt-rating">★ <strong style="margin-left:6px">4.9</strong></div>
+
+            <div class="session-box" aria-live="polite">
+              <div style="font-weight:900">Abhyanga Therapy</div>
+              <div class="session-meta">📅 Today · ⏰ 2:30 PM · ⏱ 60 mins</div>
+              <div class="session-meta" style="margin-top:6px">📍 AyurSutra Wellness Center</div>
+            </div>
+
+            <div class="actions-row">
+              <button class="btn btn-reschedule" type="button">Reschedule</button>
+              <button class="btn btn-cancel" type="button">Cancel</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- upcoming -->
+        <div>
+          <div class="section-title">Upcoming Sessions</div>
+
+          <!-- up-card elements have data-name and data-status to enable filtering -->
+          <article class="up-card" role="article" data-name="Shirodhara Treatment Dr Rajesh Kumar" data-status="upcoming">
+            <div class="up-avatar" aria-hidden><img src="https://via.placeholder.com/150" alt="Dr Rajesh"></div>
+            <div class="up-body">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+                <div>
+                  <div class="up-name">Dr. Rajesh Kumar</div>
+                  <div class="up-role">Shirodhara Specialist</div>
+                </div>
+                <div class="status-pill">⏱ Upcoming</div>
+              </div>
+              <div class="up-title">Shirodhara Treatment</div>
+              <div class="meta-row">
+                <div>📅 Tomorrow</div>
+                <div>⏰ 10:00 AM</div>
+                <div>• 45 mins</div>
+                <div style="margin-left:auto;color:var(--accent);font-weight:900;cursor:pointer">Reschedule</div>
+              </div>
+            </div>
+          </article>
+
+          <article class="up-card" role="article" data-name="Consultation Dr Anita Patel" data-status="confirmed">
+            <div class="up-avatar" aria-hidden><img src="https://via.placeholder.com/150" alt="Dr Anita"></div>
+            <div class="up-body">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+                <div>
+                  <div class="up-name">Dr. Anita Patel</div>
+                  <div class="up-role">Ayurvedic Physician</div>
+                </div>
+                <div class="status-confirm">✔ Confirmed</div>
+              </div>
+              <div class="up-title">Consultation</div>
+              <div class="meta-row">
+                <div>📅 Jan 20</div>
+                <div>⏰ 4:00 PM</div>
+                <div>• 30 mins</div>
+                <div style="margin-left:auto;color:var(--accent);font-weight:900;cursor:pointer">Reschedule</div>
+              </div>
+            </div>
+          </article>
+
+        </div>
+
+        <!-- history heading with anchor to history.html -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px">
+          <div class="section-title" style="margin:0">History</div>
+          <a class="view-all" href="history.html" title="View full history">View All</a>
+        </div>
+
+        <!-- history list (cards have data attributes to filter) -->
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="hist-card" role="article" data-name="Abhyanga Therapy Dr Priya Sharma" data-status="completed">
+            <div class="hist-avatar"><img src="https://via.placeholder.com/150" alt="Dr Rajesh"></div>
+            <div class="hist-body">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+                <div style="min-width:0">
+                  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                    <div class="hist-title">Dr. Priya Sharma</div>
+                    <div class="hist-service">• Abhyanga Massage</div>
+                  </div>
+                  <div class="hist-sub">Jan 5 at 3:30 PM</div>
+                </div>
+                <div class="hist-right">
+                  <div class="hist-status">✔ Completed</div>
+                  <div class="hist-price">₹800</div>
+                </div>
+              </div>
+              <div style="margin-top:10px;color:var(--muted);font-size:13px">📍 AyurSutra Wellness Center</div>
+            </div>
+          </div>
+
+          <div class="hist-card" role="article" data-name="Shirodhara Treatment Dr Rajesh Kumar" data-status="completed">
+            <div class="hist-avatar"><img src="https://via.placeholder.com/150" alt="Dr Rajesh"></div>
+            <div class="hist-body">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+                <div style="min-width:0">
+                  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                    <div class="hist-title">Dr. Rajesh Kumar</div>
+                    <div class="hist-service">• Shirodhara</div>
+                  </div>
+                  <div class="hist-sub">Jan 10 at 2:00 PM</div>
+                </div>
+                <div class="hist-right">
+                  <div class="hist-status">✔ Completed</div>
+                  <div class="hist-price">₹1000</div>
+                </div>
+              </div>
+              <div style="margin-top:10px;color:var(--muted);font-size:13px">📍 AyurSutra Wellness Center</div>
+            </div>
+          </div>
+
+          <div class="hist-card" role="article" data-name="Initial Consultation Dr Anita Patel" data-status="completed">
+            <div class="hist-avatar"><img src="https://via.placeholder.com/150" alt="Dr Anita"></div>
+            <div class="hist-body">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+                <div style="min-width:0">
+                  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                    <div class="hist-title">Dr. Anita Patel</div>
+                    <div class="hist-service">• Initial Consultation</div>
+                  </div>
+                  <div class="hist-sub">Dec 28 at 10:00 AM</div>
+                </div>
+                <div class="hist-right">
+                  <div class="hist-status">✔ Completed</div>
+                  <div class="hist-price">₹500</div>
+                </div>
+              </div>
+              <div style="margin-top:10px;color:var(--muted);font-size:13px">📍 AyurSutra Wellness Center</div>
+            </div>
+          </div>
+        </div>
+
+      </div> <!-- .screen -->
+
+      <!-- bottom nav -->
+      <div class="footer" aria-hidden="true">
+        <div class="nav-pill" role="navigation" aria-label="Primary nav">
+          <a href="home.html">🏠<div style="font-size:11px">Home</div></a>
+          <a href="book.html" class="active">📅<div style="font-size:11px">Book</div></a>
+          <a href="therapy.html">📚<div style="font-size:11px">Therapy</div></a>
+              <a href="history.html">📜<br/>History</a>
+          <a href="profile.html">👤<div style="font-size:11px">Profile</div></a>
+
+        </div>
+      </div>
+
+    </div> <!-- .phone -->
+  </div> <!-- .stage -->
+
+<script>
+  // Live filtering: search + chips
+  (function(){
+    const searchInput = document.getElementById('searchInput');
+    const clearBtn = document.getElementById('clearBtn');
+    const chips = document.querySelectorAll('#filterChips .chip');
+    const itemsSelector = '.up-card, .hist-card';
+    let activeFilter = 'all';
+
+    function normalize(s){ return (s||'').toString().trim().toLowerCase(); }
+
+    function applyFilter(){
+      const q = normalize(searchInput.value);
+      const items = document.querySelectorAll(itemsSelector);
+      items.forEach(it => {
+        const name = normalize(it.getAttribute('data-name') || it.textContent);
+        const status = normalize(it.getAttribute('data-status') || '');
+        // match text query
+        const matchesQuery = q === '' || name.indexOf(q) !== -1;
+        // match chip filter
+        const matchesChip = (activeFilter === 'all') || (status === activeFilter);
+        it.style.display = (matchesQuery && matchesChip) ? '' : 'none';
+      });
+    }
+
+    // search input events
+    searchInput.addEventListener('input', () => {
+      clearBtn.style.display = searchInput.value ? 'inline' : 'none';
+      applyFilter();
+    });
+    clearBtn.addEventListener('click', () => { searchInput.value = ''; clearBtn.style.display='none'; applyFilter(); searchInput.focus(); });
+
+    // chips events
+    chips.forEach(ch => {
+      ch.addEventListener('click', () => {
+        chips.forEach(c=>c.classList.remove('active'));
+        ch.classList.add('active');
+        activeFilter = ch.dataset.filter || 'all';
+        applyFilter();
+      });
+    });
+
+    // Init: apply once
+    applyFilter();
+  })();
+</script>
+</body>
+</html>

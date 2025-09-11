@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Therapy — AyurSutra Phone Prototype</title>
+<style>
+  :root{
+    --bg-start:#f3fbf9;
+    --bg-end:#eefbf6;
+    --phone-bg: linear-gradient(180deg,#f7faf8,#fbfffd);
+    --card:#ffffff;
+    --muted:#6f8a81;
+    --primary:#08b77f;
+    --accent:#eaf7ef;
+    --glass: rgba(255,255,255,0.7);
+    --radius:14px;
+    --soft-shadow: 0 10px 30px rgba(8,24,20,0.06);
+    --inner-shadow: 0 6px 18px rgba(10,20,16,0.04);
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+  }
+
+  /* PAGE: fix outer overflow and hide outer scrollbars so only phone scrolls */
+  html,body{
+    height:100%;
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    background: linear-gradient(180deg,var(--bg-start),var(--bg-end));
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    overflow-x:hidden;       /* no horizontal page overflow */
+    overflow-y:hidden;       /* hide outer vertical scrollbar (phone will scroll internally) */
+  }
+  /* hide any outer scrollbar in WebKit browsers (nice-to-have) */
+  body::-webkit-scrollbar{ width:0; height:0 }
+  /* for Firefox: avoid showing overlay scrollbars */
+  body { scrollbar-width: none; -ms-overflow-style: none; }
+
+  /* Center stage */
+  .stage {
+    width:100%;
+    max-width:420px;
+    margin:0 auto;
+    height:100vh;            /* full viewport height */
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    box-sizing:border-box;
+  }
+
+  /* Phone frame */
+  .phone {
+    width:360px;
+    max-height: calc(100vh - 48px); /* ensures phone fits viewport, prevents outer scroller */
+    height:760px;
+    border-radius:34px;
+    background: var(--phone-bg);
+    box-shadow: 0 30px 60px rgba(8,24,20,0.14);
+    border:1px solid rgba(0,0,0,0.03);
+    overflow:hidden;                    /* clip arrows/overflow inside frame */
+    display:flex;
+    flex-direction:column;
+  }
+
+  /* Safe screen area (this is the only scrollable element) */
+  .screen {
+    padding:18px;
+    box-sizing:border-box;
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    overflow-y:auto;                    /* internal scroll only */
+    -webkit-overflow-scrolling:touch;
+    background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.3));
+  }
+
+  /* nicer internal scrollbar for the phone screen */
+  .screen::-webkit-scrollbar { width:9px; }
+  .screen::-webkit-scrollbar-thumb { background: rgba(8,24,20,0.08); border-radius:999px; }
+  .screen::-webkit-scrollbar-track { background: transparent; }
+
+  /* Top header */
+  .top { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+  .greet { font-weight:800; font-size:18px; color:#0d2b25; }
+  .avatar {
+    width:40px; height:40px; border-radius:10px; background:#fff;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:var(--inner-shadow);
+    font-weight:800; color:var(--primary);
+  }
+
+  /* Card base */
+  .card {
+    background:var(--card);
+    border-radius:12px;
+    padding:12px;
+    box-shadow: var(--inner-shadow);
+    border:1px solid rgba(0,0,0,0.03);
+  }
+
+  /* Progress */
+  .progress {
+    background: linear-gradient(90deg,var(--primary),#06c78b);
+    color:#fff; padding:14px; border-radius:12px; display:flex; flex-direction:column; gap:10px;
+    box-shadow: 0 8px 22px rgba(8,183,127,0.08);
+  }
+  .progress-row { display:flex; justify-content:space-between; align-items:center; }
+  .progress-row h3 { margin:0; font-size:16px; font-weight:800; }
+  .progress-row .pval { font-weight:900; font-size:24px; }
+  .progress-track { background: rgba(255,255,255,0.12); height:8px; border-radius:999px; overflow:hidden; }
+  .progress-fill { height:8px; width:52%; background:#ffffff; opacity:0.95; }
+
+  /* Protocols list */
+  .protocols { display:flex; flex-direction:column; gap:10px; }
+  .protocol-row {
+    display:flex; gap:12px; align-items:flex-start;
+    padding:12px; border-radius:12px;
+    background: linear-gradient(180deg,#ffffff,#fbfffb);
+    border:1px solid rgba(0,0,0,0.03);
+    box-shadow: 0 6px 16px rgba(10,20,16,0.03);
+  }
+  .protocol-icon { width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; background:var(--accent); color:var(--primary); font-weight:900; font-size:14px; }
+  .protocol-body h5 { margin:0; font-size:15px; font-weight:900; color:#0f2a26; }
+  .protocol-body p { margin:8px 0 0 0; color:var(--muted); font-size:13px; line-height:1.3; }
+
+  .btn-view {
+    background:transparent;
+    border:1px solid rgba(8,183,127,0.12);
+    color:var(--primary);
+    padding:8px 10px;
+    border-radius:10px;
+    font-weight:800;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+
+  /* Tabs */
+  .tabs { display:flex; gap:10px; margin-top:6px; }
+  .tab {
+    padding:10px 14px; border-radius:999px;
+    background:linear-gradient(180deg,#fff,#fbfffb);
+    border:1px solid rgba(0,0,0,0.03);
+    font-weight:800; color:var(--muted); font-size:13px;
+    box-shadow: 0 6px 14px rgba(10,20,16,0.03);
+  }
+  .tab.active { background: linear-gradient(180deg, rgba(8,183,127,0.12), rgba(8,183,127,0.06)); color:#0f2a26; box-shadow:0 8px 20px rgba(8,183,127,0.06); }
+
+  /* Tasks */
+  .tasks { display:flex; flex-direction:column; gap:12px; margin-top:6px; }
+  .task {
+    display:flex; gap:12px; align-items:center; padding:12px; border-radius:12px;
+    background: linear-gradient(180deg,#ffffff,#fbfffb); border:1px solid rgba(0,0,0,0.03);
+    box-shadow: 0 6px 16px rgba(10,20,16,0.03);
+  }
+  .task .left { width:48px; height:48px; border-radius:999px; display:flex; align-items:center; justify-content:center; color:var(--muted); background: rgba(15,42,38,0.06); font-weight:900; }
+  .task .body { flex:1; }
+  .task h5 { margin:0; font-size:15px; font-weight:900; color:#0f2a26; }
+  .task p { margin:8px 0 0 0; color:var(--muted); font-size:13px; }
+  .task .meta { margin-top:10px; color:var(--muted); font-size:13px; display:flex; gap:12px; align-items:center; }
+
+  .start-btn { background:var(--primary); color:#fff; padding:8px 12px; border-radius:999px; border:0; font-weight:900; cursor:pointer; box-shadow:0 8px 18px rgba(8,183,127,0.08); }
+
+  /* phone footer with centered logo + bottom nav anchors */
+  .phone-footer {
+    height:88px; /* room for nav and logo */
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.85));
+    border-top: 1px solid rgba(0,0,0,0.02);
+    padding:8px 12px;
+    gap:8px;
+  }
+
+  /* small nav row */
+  .footer-nav {
+    width:100%;
+    max-width:320px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:0 6px;
+  }
+  .footer-nav a {
+    text-decoration:none;
+    color:var(--muted);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:4px;
+    font-size:12px;
+    width:56px;
+    text-align:center;
+    font-weight:800;
+  }
+  .footer-nav a.active { color:var(--primary); }
+
+  /* pill behind logo */
+  .footer-pill {
+    width:70px;
+    height:34px;
+    border-radius:20px;
+    background:rgba(8,183,127,0.06);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow: 0 6px 14px rgba(8,183,127,0.04);
+  }
+  .logo-svg { width:20px; height:20px; display:block; }
+
+  /* small screens tweak */
+  @media (max-width:360px){
+    .phone { width:340px; height:720px; }
+    .progress-row .pval { font-size:20px; }
+  }
+</style>
+</head>
+<body>
+  <div class="stage" role="main" aria-label="Phone prototype">
+    <div class="phone" role="region" aria-label="App phone">
+      <div class="screen" id="screen">
+
+        <!-- header -->
+        <div class="top">
+          <div class="greet">Therapy Module</div>
+          <div class="avatar" id="miniBadge">M</div>
+        </div>
+
+        <!-- progress card -->
+        <div class="card progress" aria-hidden="true">
+          <div class="progress-row">
+            <div>
+              <h3>Today's Progress</h3>
+              <div style="font-size:13px; opacity:0.95">2 of 4 tasks completed</div>
+            </div>
+            <div class="pval">50%</div>
+          </div>
+          <div class="progress-track"><div class="progress-fill" style="width:52%"></div></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px">
+            <div></div>
+            <div style="opacity:0.95">🔥 7 day streak</div>
+          </div>
+        </div>
+
+        <!-- protocols preview -->
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <div style="font-weight:900">Therapy Protocols</div>
+            <a href="protocols.html" style="font-weight:900;color:var(--primary);text-decoration:none">View all →</a>
+          </div>
+
+          <div class="protocols">
+            <div class="protocol-row">
+              <div class="protocol-icon">A</div>
+              <div style="flex:1">
+                <div class="protocol-body">
+                  <h5>Abhyanga — Oil Massage</h5>
+                  <p>Warm oil full-body massage that improves circulation, relaxes muscles and calms the nervous system.</p>
+                </div>
+              </div>
+              <div class="protocol-actions">
+                <button class="btn-view" onclick="location.href='protocols.html#abhyanga'">View</button>
+              </div>
+            </div>
+
+            <div class="protocol-row">
+              <div class="protocol-icon">S</div>
+              <div style="flex:1">
+                <div class="protocol-body">
+                  <h5>Shirodhara</h5>
+                  <p>Continuous warm oil poured on the forehead to reduce stress and improve sleep quality.</p>
+                </div>
+              </div>
+              <div class="protocol-actions">
+                <button class="btn-view" onclick="location.href='protocols.html#shirodhara'">View</button>
+              </div>
+            </div>
+
+            <div class="protocol-row">
+              <div class="protocol-icon">D</div>
+              <div style="flex:1">
+                <div class="protocol-body">
+                  <h5>Dinacharya — Daily Routine</h5>
+                  <p>Personalized daily practices (cleansing, oil pulling, breathing & evening routine) to support balance.</p>
+                </div>
+              </div>
+              <div class="protocol-actions">
+                <button class="btn-view" onclick="location.href='protocols.html#dinacharya'">View</button>
+              </div>
+            </div>
+
+            <div style="margin-top:6px;color:var(--muted);font-size:13px">Tap "View all" to open the full protocols page with precautions & step-by-step guidance.</div>
+          </div>
+        </div>
+
+        <!-- tabs & tasks -->
+        <div>
+          <div class="tabs" role="tablist">
+            <div class="tab active" role="tab">Today's Tasks</div>
+            <div class="tab" role="tab">Exercises</div>
+            <div class="tab" role="tab">Videos</div>
+          </div>
+
+          <div class="tasks" style="margin-top:8px">
+            <div class="task">
+              <div class="left">✓</div>
+              <div class="body">
+                <h5 style="text-decoration:line-through;color:var(--muted)">Morning Pranayama</h5>
+                <p>Deep breathing exercises to start your day</p>
+                <div class="meta"><div>⏱ 10 min</div><div>🔥 7 days</div></div>
+              </div>
+            </div>
+
+            <div class="task">
+              <div class="left">●</div>
+              <div class="body">
+                <h5>Ashwagandha Intake</h5>
+                <p>Take 500mg with warm milk</p>
+                <div class="meta"><div>⏱ 2 min</div><div>⏰ 8:00 AM</div></div>
+              </div>
+              <div>
+                <button class="start-btn">Start</button>
+              </div>
+            </div>
+
+            <div class="task">
+              <div class="left">✓</div>
+              <div class="body">
+                <h5 style="text-decoration:line-through;color:var(--muted)">Oil Pulling</h5>
+                <p>Swish sesame oil for oral health</p>
+                <div class="meta"><div>⏱ 15 min</div><div>🔥 5 days</div></div>
+              </div>
+              <div>
+                <div style="width:36px;height:36px;border-radius:999px;background:rgba(0,0,0,0.03);display:flex;align-items:center;justify-content:center;color:var(--muted)">♡</div>
+              </div>
+            </div>
+
+            <div class="task">
+              <div class="left">●</div>
+              <div class="body">
+                <h5>Evening Meditation</h5>
+                <p>Mindfulness meditation session</p>
+                <div class="meta"><div>⏱ 20 min</div><div>⏰ 7:00 PM</div></div>
+              </div>
+              <div>
+                <button class="start-btn">Start</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div> <!-- .screen -->
+
+      <!-- PHONE FOOTER: centered logo inside a pill + nav anchors -->
+      <div class="phone-footer" aria-hidden="true">
+        <!-- small nav row with anchors -->
+        <nav class="footer-nav" aria-label="Primary navigation">
+          <a href="home.html" title="Home" class="active" aria-current="page">
+            <div aria-hidden style="font-size:18px">🏠</div>
+            <div>Home</div>
+          </a>
+          <a href="book.html" title="Book">
+            <div aria-hidden style="font-size:18px">📅</div>
+            <div>Book</div>
+          </a>
+          <a href="therapy.html" title="Therapy">
+            <div aria-hidden style="font-size:18px">📚</div>
+            <div>Therapy</div>
+          </a>
+          <a href="profile.html" title="Profile">
+            <div aria-hidden style="font-size:18px">👤</div>
+            <div>Profile</div>
+          </a>
+          <a href="history.html" title="History">
+            <div aria-hidden style="font-size:18px">📜</div>
+            <div>History</div>
+          </a>
+        </nav>
+
+        <!-- centered logo pill -->
+        <div class="footer-pill" title="AyurSutra">
+          <!-- small leaf SVG as logo -->
+          <svg class="logo-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path fill="#08b77f" d="M12 2C9.8 6 6 9 3.5 11.5 5.7 14.7 9.7 18 14 18c2.2 0 4.5-.8 6.5-2.4C18.8 12 15.6 5.4 12 2z"/>
+            <path fill="#06a96b" d="M7 17c1.7 0 3.8-.8 5.5-2.1C15.1 13.8 16 12.2 16 11c-2.1.6-4.6-1.1-6-3.5-2 1.8-4 5-3 9z" opacity="0.95"/>
+          </svg>
+        </div>
+      </div>
+
+    </div> <!-- .phone -->
+  </div> <!-- .stage -->
+
+<script>
+  // Safely set the mini badge initial if localStorage has a valid name
+  document.addEventListener('DOMContentLoaded', () => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('ayur_user') || '{}');
+      if (saved && saved.name && typeof saved.name === 'string' && saved.name.length) {
+        document.getElementById('miniBadge').textContent = saved.name.trim().charAt(0).toUpperCase();
+      }
+    } catch (e) {
+      console.warn('Could not read ayur_user from localStorage');
+    }
+  });
+</script>
+</body>
+</html>

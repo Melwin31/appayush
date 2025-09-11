@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Therapy History — AyurSutra (Phone)</title>
+<style>
+  :root{
+    --bg-start:#f3fbf9;
+    --bg-end:#eefbf6;
+    --phone-bg: linear-gradient(180deg,#f7faf8,#fbfffd);
+    --card:#ffffff;
+    --muted:#6f8a81;
+    --primary:#08b77f;
+    --accent:#eaf7ef;
+    --glass: rgba(255,255,255,0.7);
+    --radius:14px;
+    --soft-shadow: 0 10px 30px rgba(8,24,20,0.06);
+    --inner-shadow: 0 6px 18px rgba(10,20,16,0.04);
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+  }
+
+  /* page background and centering */
+  html,body { height:100%; margin:0; background: linear-gradient(180deg,var(--bg-start),var(--bg-end)); display:flex; align-items:center; justify-content:center; padding:24px; }
+  .stage { width:100%; max-width:420px; display:flex; justify-content:center; }
+
+  /* phone frame */
+  .phone {
+    width:360px; height:760px; border-radius:34px;
+    background:var(--phone-bg); box-shadow: 0 30px 60px rgba(8,24,20,0.14);
+    overflow:hidden; border:1px solid rgba(0,0,0,0.03);
+    display:flex; flex-direction:column;
+  }
+
+  /* safe area (scrolling content) */
+  .screen {
+    padding:18px; box-sizing:border-box; flex:1; display:flex; flex-direction:column; gap:12px;
+    overflow:auto; -webkit-overflow-scrolling:touch;
+    background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.3));
+  }
+
+  /* header */
+  .top { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .back { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; background:#fff; box-shadow:var(--inner-shadow); cursor:pointer; border:1px solid rgba(0,0,0,0.03); }
+  .heading { font-size:20px; font-weight:800; color:#092a24; line-height:1; }
+  .sub { font-size:12px; color:var(--muted); margin-top:4px; }
+
+  /* search input */
+  .search {
+    display:flex; align-items:center; gap:10px; background:var(--card); padding:12px; border-radius:12px; border:1px solid rgba(0,0,0,0.03); box-shadow:var(--inner-shadow);
+  }
+  .search input { border:0; outline:none; font-size:14px; color:#07221a; background:transparent; flex:1; }
+
+  /* stats grid */
+  .stats { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+  .stat-card {
+    background: linear-gradient(180deg,#fff,#fbfffb);
+    border-radius:12px; padding:12px; box-shadow:var(--inner-shadow); border:1px solid rgba(0,0,0,0.02);
+    min-height:70px;
+  }
+  .stat-card strong { display:block; font-size:14px; color:#fff; font-weight:800; }
+  .stat-card .big { font-size:18px; font-weight:900; margin-top:6px; color:#fff; }
+  .stat-green { background: linear-gradient(135deg,#00b26a,#06c78b); }
+  .stat-blue  { background: linear-gradient(135deg,#92caff,#bfe2ff); color:#05314a; }
+  .stat-pink  { background: linear-gradient(135deg,#f3a8ff,#ffb7d9); color:#2b0a2b; }
+  .stat-orange{ background: linear-gradient(135deg,#ff9a6b,#ffb36b); color:#3a1a10; }
+
+  /* tabs pill */
+  .pill-tabs { display:flex; gap:8px; margin-top:6px; background:transparent; }
+  .pill-tab { padding:10px 14px; border-radius:999px; background:var(--card); border:1px solid rgba(0,0,0,0.03); font-weight:700; color:var(--muted); box-shadow:var(--inner-shadow); font-size:13px; }
+  .pill-tab.active { background: linear-gradient(180deg, rgba(8,183,127,0.12), rgba(8,183,127,0.06)); color:#0f2a26; box-shadow: 0 8px 20px rgba(8,183,127,0.06); }
+
+  /* filter chips */
+  .chips { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+  .chip { padding:9px 12px; border-radius:999px; background:var(--card); border:1px solid rgba(0,0,0,0.03); color:var(--muted); font-weight:700; box-shadow:var(--inner-shadow); font-size:13px; }
+  .chip.active { background:var(--primary); color:#fff; box-shadow:0 8px 18px rgba(8,183,127,0.08); }
+
+  /* history card */
+  .history-card {
+    background:var(--card); border-radius:12px; padding:14px; display:flex; gap:12px; align-items:flex-start;
+    box-shadow:var(--inner-shadow); border:1px solid rgba(0,0,0,0.03);
+  }
+  .avatar-sm { width:56px; height:56px; border-radius:12px; flex:0 0 56px; overflow:hidden; display:flex; align-items:center; justify-content:center; background:#f1fbf9; color:var(--primary); font-weight:800; }
+  .hist-body { flex:1; }
+  .hist-body h4 { margin:0; font-size:16px; font-weight:900; color:#082f28; }
+  .hist-sub { color:var(--muted); font-size:13px; margin-top:6px; }
+  .hist-meta { margin-top:10px; display:flex; gap:10px; align-items:center; color:var(--muted); font-size:13px; flex-wrap:wrap; }
+  .price-badge { font-weight:900; color:var(--primary); font-size:16px; }
+
+  .status-pill { background: #eaf7ef; color: #0c744b; padding:6px 10px; border-radius:999px; font-weight:800; font-size:12px; border:1px solid rgba(8,183,127,0.06); }
+
+  .note { margin-top:10px; background:#fbfffd; border-radius:8px; padding:10px; color:var(--muted); font-size:13px; border:1px solid rgba(0,0,0,0.02); }
+
+  /* bottom nav pill (safe, floating) */
+  .bottom-nav { position:sticky; bottom:14px; display:flex; justify-content:center; padding:0 18px; }
+  .nav-pill {
+    width:100%; max-width:360px; background:rgba(255,255,255,0.98); border-radius:40px; padding:12px 18px; display:flex; justify-content:space-around; align-items:center;
+    box-shadow: 0 18px 40px rgba(16,24,24,0.06);
+  }
+  .nav-pill a { text-decoration:none; color:var(--muted); text-align:center; font-weight:700; font-size:13px; display:flex; flex-direction:column; gap:6px; align-items:center; }
+  .nav-pill a.active { color:var(--primary); }
+
+  /* comfortable scroll bar look for desktop preview */
+  .screen::-webkit-scrollbar { width:10px; }
+  .screen::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.08); border-radius:999px; }
+  .screen::-webkit-scrollbar-track { background: rgba(0,0,0,0.01); border-radius:999px; }
+
+  /* responsive tweak */
+  @media (max-width:360px) {
+    .phone { width:340px; height:700px; }
+  }
+</style>
+</head>
+<body>
+  <div class="stage" role="main" aria-label="Phone prototype">
+    <div class="phone" role="region" aria-label="App phone">
+      <div class="screen">
+
+        <!-- header -->
+        <div class="top">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div class="back" onclick="location.href='home.html'">←</div>
+            <div>
+              <div class="heading">Therapy History</div>
+              <div class="sub">Complete wellness journey</div>
+            </div>
+          </div>
+          <div class="back" title="Export" onclick="alert('Exported (mock)')">⬇︎</div>
+        </div>
+
+        <!-- search -->
+        <div class="search" role="search" aria-label="Search therapies">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="opacity:0.6"><path d="M21 21l-4.35-4.35" stroke="#6b7b72" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="11" cy="11" r="6" stroke="#6b7b72" stroke-width="1.6"/></svg>
+          <input type="search" placeholder="Search therapy or doctor..." />
+          <button title="Filters" onclick="alert('Filters (mock)')" style="background:#fff;border:0;outline:none;cursor:pointer;border-radius:10px;padding:8px;box-shadow:var(--inner-shadow)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M6 12h12M10 18h4" stroke="#6b7b72" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+
+        <!-- stats -->
+        <div class="stats">
+          <div class="stat-card stat-green">
+            <div style="font-weight:700;font-size:13px;color:rgba(255,255,255,0.92)">Total Sessions</div>
+            <div class="big">5 <span style="font-size:12px; font-weight:600; opacity:0.95">of 6 booked</span></div>
+          </div>
+          <div class="stat-card stat-blue">
+            <div style="font-weight:700;font-size:13px;color:rgba(0,0,0,0.65)">Avg Rating</div>
+            <div class="big">4.6 ★ <div style="font-size:11px;font-weight:700;opacity:0.9">satisfaction score</div></div>
+          </div>
+          <div class="stat-card stat-pink">
+            <div style="font-weight:700;font-size:13px;color:rgba(0,0,0,0.65)">Total Spent</div>
+            <div class="big">₹5300</div>
+            <div style="font-size:12px;color:rgba(0,0,0,0.6);margin-top:6px;font-weight:700">wellness investment</div>
+          </div>
+          <div class="stat-card stat-orange">
+            <div style="font-weight:700;font-size:13px;color:rgba(0,0,0,0.65)">This Month</div>
+            <div class="big">3</div>
+            <div style="font-size:12px;color:rgba(0,0,0,0.6);margin-top:6px;font-weight:700">sessions completed</div>
+          </div>
+        </div>
+
+        <!-- tabs -->
+        <div class="pill-tabs" role="tablist" aria-label="View options">
+          <div class="pill-tab active">Sessions</div>
+          <div class="pill-tab">Analytics</div>
+          <div class="pill-tab">Monthly</div>
+        </div>
+
+        <!-- quick filter chips -->
+        <div class="chips" aria-hidden>
+          <div class="chip active">All</div>
+          <div class="chip">Completed</div>
+          <div class="chip">Missed</div>
+          <div class="chip">Cancelled</div>
+        </div>
+
+        <!-- history list -->
+        <div style="display:flex;flex-direction:column;gap:12px;margin-top:6px">
+
+          <!-- item 1 -->
+          <div class="history-card" role="article">
+            <div class="avatar-sm">
+              <!-- placeholder avatar - always visible -->
+              <img src="https://via.placeholder.com/56/ffffff/08b77f?text=Pr" alt="Priya" style="width:56px;height:56px;object-fit:cover;border-radius:12px"/>
+            </div>
+            <div class="hist-body">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+                <div>
+                  <h4>Abhyanga Therapy</h4>
+                  <div class="hist-sub">Dr. Priya Sharma · Panchakarma Specialist</div>
+                </div>
+                <div style="text-align:right">
+                  <div class="status-pill">Completed</div>
+                  <div style="margin-top:8px" class="price-badge">₹1200</div>
+                </div>
+              </div>
+
+              <div class="hist-meta">
+                <div>📅 Jan 15, 2025</div>
+                <div>⏰ 2:30 PM</div>
+                <div>• 60 mins</div>
+                <div style="margin-left:auto;color:#f3a712;font-weight:800">★ 5</div>
+              </div>
+
+              <div class="note">Excellent session, feeling very relaxed</div>
+              <div style="margin-top:8px;color:var(--muted);font-size:13px">📍 AyurSutra Wellness Center</div>
+            </div>
+          </div>
+
+          <!-- item 2 -->
+          <div class="history-card" role="article">
+            <div class="avatar-sm">
+              <img src="https://via.placeholder.com/56/ffffff/08b77f?text=Rj" alt="Rajesh" style="width:56px;height:56px;object-fit:cover;border-radius:12px"/>
+            </div>
+            <div class="hist-body">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+                <div>
+                  <h4>Shirodhara Treatment</h4>
+                  <div class="hist-sub">Dr. Rajesh Kumar · Shirodhara Specialist</div>
+                </div>
+                <div style="text-align:right">
+                  <div class="status-pill">Completed</div>
+                  <div style="margin-top:8px" class="price-badge">₹1000</div>
+                </div>
+              </div>
+
+              <div class="hist-meta">
+                <div>📅 Jan 10, 2025</div>
+                <div>⏰ 10:00 AM</div>
+                <div>• 45 mins</div>
+                <div style="margin-left:auto;color:#f3a712;font-weight:800">★ 4</div>
+              </div>
+
+              <div class="note">Very calming, helped with stress</div>
+              <div style="margin-top:8px;color:var(--muted);font-size:13px">📍 AyurSutra Wellness Center</div>
+            </div>
+          </div>
+
+          <!-- item 3 -->
+          <div class="history-card" role="article">
+            <div class="avatar-sm">
+              <img src="https://via.placeholder.com/56/ffffff/08b77f?text=An" alt="Anita" style="width:56px;height:56px;object-fit:cover;border-radius:12px"/>
+            </div>
+            <div class="hist-body">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+                <div>
+                  <h4>Ayurvedic Consultation</h4>
+                  <div class="hist-sub">Dr. Anita Patel · Ayurvedic Physician</div>
+                </div>
+                <div style="text-align:right">
+                  <div class="status-pill">Completed</div>
+                  <div style="margin-top:8px" class="price-badge">₹500</div>
+                </div>
+              </div>
+
+              <div class="hist-meta">
+                <div>📅 Jan 8, 2025</div>
+                <div>⏰ 4:00 PM</div>
+                <div>• 30 mins</div>
+                <div style="margin-left:auto;color:#f3a712;font-weight:800">★ 5</div>
+              </div>
+
+              <div class="note">Helpful guidance on lifestyle changes</div>
+              <div style="margin-top:8px;color:var(--muted);font-size:13px">📍 AyurSutra Wellness Center</div>
+            </div>
+          </div>
+
+        </div> <!-- list -->
+
+      </div> <!-- screen -->
+
+      <!-- bottom nav -->
+      <div style="padding:12px; background:linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.8)); border-top:1px solid rgba(0,0,0,0.02)">
+        <div class="bottom-nav">
+          <div class="nav-pill" role="navigation" aria-label="Bottom navigation">
+            <a href="home.html"><span style="font-size:18px">🏠</span><span style="font-size:12px">Home</span></a>
+            <a href="book.html"><span style="font-size:18px">📅</span><span style="font-size:12px">Book</span></a>
+            <a href="therapy.html" class="active"><span style="font-size:18px">📚</span><span style="font-size:12px">Therapy</span></a>
+            <a href="profile.html"><span style="font-size:18px">👤</span><span style="font-size:12px">Profile</span></a>
+          </div>
+        </div>
+      </div>
+
+    </div> <!-- phone -->
+  </div> <!-- stage -->
+
+<script>
+  // If you want to show real avatars from data, replace the src attributes above with your real image URLs.
+  // For example:
+  // document.querySelectorAll('.avatar-sm img')[0].src = 'https://example.com/path/to/avatar.jpg'
+</script>
+</body>
+</html>

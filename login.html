@@ -1,0 +1,180 @@
+<!-- <!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Login - AyurSutra</title>
+<style>
+  :root{
+    --bg-start: #f3fbf9;
+    --bg-end: #eefbf6;
+    --muted: #809089;
+    --primary: #08b77f;
+    --panel: #ffffff;
+    --soft-shadow: 0 10px 30px rgba(16,24,24,0.08);
+    --card-radius: 16px;
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  }
+
+  html,body{height:100%;margin:0}
+  body{
+    background: linear-gradient(180deg,var(--bg-start),var(--bg-end));
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:36px 18px;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    color:#0f2a26;
+  }
+
+  .wrap{
+    width:100%;
+    max-width:420px;
+    text-align:center;
+  }
+
+  .hero{
+    text-align:center;
+    margin-bottom:18px;
+  }
+  .logo-circle{
+    width:72px;height:72px;border-radius:999px;
+    background:linear-gradient(180deg,#00c67a,#06b77f);
+    display:inline-flex;align-items:center;justify-content:center;
+    color:#fff;font-size:30px;margin-bottom:16px;box-shadow:0 6px 18px rgba(6,119,127,0.12);
+  }
+  h2{margin:0;font-size:28px;font-weight:800}
+  .subtitle{color:var(--muted);margin-top:8px;font-size:14px}
+
+  .login-card{
+    background:var(--panel);
+    border-radius:var(--card-radius);
+    padding:18px;
+    box-shadow:var(--soft-shadow);
+    margin-top:18px;
+  }
+
+  /* tabs */
+  .tab-row{
+    display:flex;
+    gap:8px;
+    background:linear-gradient(180deg,#f6f8f7,#fcfffd);
+    padding:6px;
+    border-radius:999px;
+    margin-bottom:14px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.6);
+  }
+  .tab{
+    flex:1;
+    text-align:center;
+    padding:10px 12px;
+    border-radius:999px;
+    font-weight:800;
+    color:var(--muted);
+    cursor:pointer;
+    user-select:none;
+  }
+  .tab.active{
+    background:linear-gradient(180deg,rgba(15,191,123,0.12),rgba(15,191,123,0.06));
+    color:#0f2a26;
+    box-shadow:0 4px 10px rgba(15,191,123,0.06);
+  }
+
+  /* input with icon */
+  .field {
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:#f4f6f5;
+    border-radius:12px;
+    padding:12px;
+    border:1px solid rgba(0,0,0,0.03);
+    margin-bottom:14px;
+  }
+  .field .icon{
+    width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.03);font-size:16px;color:var(--muted);
+  }
+  .field input{
+    border:0;background:transparent;outline:none;font-size:15px;color:#12221b;flex:1;
+  }
+
+  /* send button - KEEP onclick anchor exactly as requested */
+  .btn-primary{
+    width:100%;
+    padding:14px;
+    background:linear-gradient(180deg,var(--primary),#07a86c);
+    border:0;border-radius:12px;color:#fff;font-weight:800;font-size:16px;
+    box-shadow:0 8px 22px rgba(7,168,108,0.18);
+    cursor:pointer;
+  }
+
+  .terms{font-size:13px;color:var(--muted);margin-top:14px;text-align:center;}
+  .terms a{color:var(--primary);text-decoration:underline;font-weight:700}
+
+  @media (max-width:360px){
+    h2{font-size:24px}
+    .logo-circle{width:64px;height:64px}
+  }
+</style>
+</head>
+<body>
+  <div class="wrap" role="main" aria-labelledby="welcomeTitle">
+    <div class="hero">
+      <div class="logo-circle" aria-hidden>🍃</div>
+      <h2 id="welcomeTitle">Welcome Back</h2>
+      <p class="subtitle">Sign in to continue your wellness journey</p>
+    </div>
+
+    <div class="login-card" role="form" aria-label="Sign in">
+      <div class="tab-row" role="tablist" aria-label="Choose login method">
+        <div class="tab active" role="tab" id="tab-email" data-mode="email" aria-selected="true">Email</div>
+        <div class="tab" role="tab" id="tab-phone" data-mode="phone" aria-selected="false">Phone</div>
+      </div>
+
+      <div class="field" aria-hidden="false">
+        <div class="icon" aria-hidden>✉️</div>
+        <input id="authInput" type="email" placeholder="Enter your email" aria-label="Email or phone input" />
+      </div>
+
+      <!-- BUTTON ANCHOR PRESERVED: onclick navigates to home.html as you requested -->
+      <button class="btn-primary" onclick="location.href='home.html'">Send OTP</button>
+
+      <p class="terms">By continuing, you agree to our <a href="#" target="_blank" rel="noopener">Terms &amp; Privacy Policy</a></p>
+    </div>
+  </div>
+
+<script>
+  // Tab switching logic (email / phone) — this does not change the button's onclick anchor
+  (function(){
+    const tabs = document.querySelectorAll('.tab');
+    const input = document.getElementById('authInput');
+    const icon = document.querySelector('.field .icon');
+
+    tabs.forEach(tab=>{
+      tab.addEventListener('click', ()=>{
+        tabs.forEach(t=>{
+          t.classList.remove('active');
+          t.setAttribute('aria-selected','false');
+        });
+        tab.classList.add('active');
+        tab.setAttribute('aria-selected','true');
+
+        const mode = tab.dataset.mode;
+        if(mode === 'phone'){
+          input.placeholder = 'Enter your phone (e.g. +91 98765 43210)';
+          input.type = 'tel';
+          icon.textContent = '📱';
+        } else {
+          input.placeholder = 'Enter your email';
+          input.type = 'email';
+          icon.textContent = '✉️';
+        }
+        input.value = '';
+        input.focus();
+      });
+    });
+  })();
+</script>
+</body>
+</html> -->

@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Home — AyurSutra (Prototype)</title>
+<style>
+  /* ---------- Design tokens ---------- */
+  :root{
+    --bg-top: #eefbf6;
+    --bg-bot: #f3fbf9;
+    --phone-bg-start: #f7faf8;
+    --phone-bg-end: #fbfffd;
+    --card: #ffffff;
+    --muted: #809089;
+    --muted-2: #6f8a81;
+    --accent: #08b77f;
+    --accent-2: #1fae6d;
+    --danger: #e54b4b;
+    --glass: rgba(255,255,255,0.9);
+    --radius: 14px;
+    --phone-w: 360px;
+    --phone-h: 760px;
+    --soft-shadow: 0 30px 60px rgba(8,24,20,0.10);
+    --inner-shadow: 0 8px 26px rgba(10,20,16,0.04);
+    --type-sans: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  }
+
+  /* ---------- Page layout (center phone) ---------- */
+  html,body{
+    height:100%;
+    margin:0;
+    background: linear-gradient(180deg, var(--bg-top), var(--bg-bot));
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    font-family: var(--type-sans);
+    color:#0f2a26;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    box-sizing:border-box;
+  }
+
+  .stage{ width:100%; max-width:420px; display:flex; justify-content:center; }
+
+  /* ---------- Phone shell ---------- */
+  .phone{
+    width:var(--phone-w);
+    height:var(--phone-h);
+    border-radius:34px;
+    overflow:hidden;
+    background: linear-gradient(180deg,var(--phone-bg-start),var(--phone-bg-end));
+    box-shadow: var(--soft-shadow);
+    border:1px solid rgba(0,0,0,0.03);
+    display:flex;
+    flex-direction:column;
+  }
+
+  /* ---------- Scrollable content ---------- */
+  .content{
+    padding:18px;
+    flex:1;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,255,255,0.6));
+  }
+
+  /* thin subtle inner scrollbar (desktop preview) */
+  .content::-webkit-scrollbar{ width:8px; }
+  .content::-webkit-scrollbar-thumb{
+    background: linear-gradient(180deg, rgba(0,0,0,0.12), rgba(0,0,0,0.06));
+    border-radius:999px;
+    border:2px solid rgba(255,255,255,0.85);
+  }
+  .content::-webkit-scrollbar-track{ background: transparent; }
+
+  /* ---------- Header ---------- */
+  .header{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .profile-info{ display:flex; gap:12px; align-items:center; min-width:0 }
+  .avatar{
+    width:56px; height:56px; border-radius:12px; background:var(--card);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: var(--inner-shadow);
+    font-weight:900; color:var(--accent);
+    flex-shrink:0;
+  }
+  .greeting small{ display:block; color:var(--muted); font-size:13px; line-height:1 }
+  .greeting strong{ display:block; font-size:18px; margin-top:4px; font-weight:900; color:#07221a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+  /* simple utility ghost icon */
+  .icon-ghost{ width:40px; height:40px; border-radius:12px; background:var(--glass); display:inline-flex; align-items:center; justify-content:center; box-shadow:var(--inner-shadow); border:1px solid rgba(0,0,0,0.03); cursor:pointer }
+
+  /* ---------- Cards ---------- */
+  .card{
+    background:var(--card);
+    border-radius:14px;
+    padding:12px;
+    box-shadow: var(--inner-shadow);
+    border:1px solid rgba(0,0,0,0.03);
+  }
+
+  /* Wellness score hero */
+  .well-card{ background: linear-gradient(135deg, #06c56f, #08b77f); color:#fff; padding:16px; border-radius:16px; box-shadow:0 12px 32px rgba(8,183,127,0.08); display:flex; flex-direction:column; gap:10px }
+  .well-row{ display:flex; justify-content:space-between; align-items:center; gap:12px }
+  .well-title{ font-weight:800; font-size:15px; color:rgba(255,255,255,0.95) }
+  .well-sub{ font-size:13px; opacity:0.95; color:rgba(255,255,255,0.95); margin-top:6px; font-weight:700 }
+  .well-score{ font-size:26px; font-weight:900; color:#fff; text-align:right }
+  .well-progress{ height:10px; border-radius:999px; background: rgba(255,255,255,0.12); overflow:hidden; margin-top:6px; }
+  .well-progress .bar{ height:100%; width:78%; background: linear-gradient(90deg,#a9f1c9,#00d182); border-radius:999px; transition:width .9s ease; box-shadow: inset 0 -2px 8px rgba(255,255,255,0.06); }
+
+  .quick-actions{ display:flex; gap:10px; margin-top:12px }
+  .action{ flex:1; background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.06)); border-radius:12px; padding:10px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; color:#01362a; font-weight:800; cursor:pointer; border:1px solid rgba(255,255,255,0.06) }
+
+  /* ---------- Chart placeholder ---------- */
+  .section-title{ font-weight:900; font-size:16px; color:#07221a; margin-top:6px; display:flex; justify-content:space-between; align-items:center }
+  .chart-placeholder{ min-height:72px; border-radius:12px; background: linear-gradient(180deg, #fbfffb, #f8fff9); display:flex; align-items:center; justify-content:center; color:var(--muted); font-weight:800; padding:12px; box-shadow: 0 8px 20px rgba(10,20,16,0.03) }
+
+  /* ---------- Vitals grid ---------- */
+  .vitals{ display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; margin-top:8px }
+  .vital{ background: linear-gradient(180deg,#fff,#fbfffb); border-radius:12px; padding:10px; display:flex; align-items:center; gap:10px; box-shadow:0 8px 20px rgba(10,20,16,0.03) }
+  .ring{ width:64px; height:64px; position:relative; flex:0 0 64px }
+  .ring svg{ width:100%; height:100%; transform:rotate(-90deg) }
+  .ring .value{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-weight:900; color:#07221a }
+  .vital-info{ display:flex; flex-direction:column; gap:4px }
+  .vital-label{ font-weight:800; font-size:13px }
+  .vital-sub{ color:var(--muted); font-size:12px }
+
+  /* ---------- Upcoming appointments / recommended ---------- */
+  .appt-row{ display:flex; gap:10px; align-items:center; background: linear-gradient(180deg,#fff,#fbfffb); padding:10px; border-radius:12px; box-shadow:var(--inner-shadow); border:1px solid rgba(0,0,0,0.03) }
+  .appt-row .meta{ flex:1 }
+  .appt-tag{ background: #ecfff6; color:var(--accent); padding:6px 10px; border-radius:10px; font-weight:800; }
+
+  .recommended{ display:flex; flex-direction:column; gap:10px; margin-top:6px }
+  .reco{ display:flex; justify-content:space-between; align-items:center; background:linear-gradient(180deg,#fff,#fbfffb); padding:10px; border-radius:12px; border:1px solid rgba(0,0,0,0.03); box-shadow:var(--inner-shadow) }
+  .reco .thumb{ width:44px; height:44px; border-radius:10px; background:#f0fff5; display:flex; align-items:center; justify-content:center; font-weight:900; color:var(--accent) }
+  .book-btn{ background:var(--accent); color:#fff; border:0; padding:8px 10px; border-radius:8px; cursor:pointer; font-weight:800 }
+
+  /* wellness tip */
+  .tip{ background: linear-gradient(90deg,#58d5ff,#a3f0d7); color:#08323a; padding:12px; border-radius:12px; font-weight:800; box-shadow: 0 12px 26px rgba(32,180,150,0.06) }
+
+  /* ---------- Bottom nav (pill) ---------- */
+  .bottom{ padding:10px; background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,255,255,0.9)); border-top:1px solid rgba(0,0,0,0.02) }
+  .nav{ display:flex; justify-content:space-around; max-width:360px; margin:0 auto }
+  .nav a{ text-decoration:none; color:var(--muted); display:flex; flex-direction:column; align-items:center; gap:6px; font-weight:800; font-size:12px }
+  .nav a.active{ color:var(--accent); }
+
+  /* responsive */
+  @media (max-width:360px){
+    .phone{ width:340px; height:700px }
+    .ring{ width:56px; height:56px }
+    .avatar{ width:48px; height:48px }
+  }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="phone" role="region" aria-label="AyurSutra phone prototype">
+      <div class="content">
+
+        <!-- header -->
+        <div class="header" role="banner">
+          <div class="profile-info">
+            <div class="avatar" id="avatar">M</div>
+            <div style="min-width:0">
+              <small id="greetTime">Good morning,</small>
+              <strong id="userName">Melwin</strong>
+            </div>
+          </div><a href="notification.html">
+          <button class="icon-ghost" aria-label="Notifications" title="Notifications"></button></a>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 17H9l-1-2V10a4 4 0 1 1 8 0v5l-1 2z" stroke="#6b7b72" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+
+        <!-- wellness hero -->
+        <div class="well-card" role="region" aria-labelledby="wellness-title">
+          <div class="well-row">
+            <div>
+              <div id="wellness-title" class="well-title">Wellness Score</div>
+              <div class="well-sub">Based on your activities</div>
+            </div>
+            <div class="well-score" aria-live="polite"><span id="wellNum">78</span><div style="font-size:12px;font-weight:700;opacity:0.92">↗ +5 this week</div></div>
+          </div>
+
+          <div class="well-progress" aria-hidden><div class="bar" style="width:78%"></div></div>
+
+          <div class="quick-actions" role="group" aria-label="Quick actions">
+            <div class="action" onclick="location.href='book.html'">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="3" stroke="#bfece0" stroke-width="1.4"/><path d="M16 2v4M8 2v4" stroke="#0b6a4d" stroke-width="1.6" stroke-linecap="round"/></svg>
+              <div>Book Therapy</div>
+            </div>
+            <div class="action" onclick="location.href='therapy.html'">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 19v-8M10 19v-12M16 19v-5M22 19v-9" stroke="#6b7b72" stroke-width="1.4" stroke-linecap="round"/></svg>
+              <div>View Progress</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- progress -->
+        <div>
+          <div class="section-title">Your Progress</div>
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div style="font-weight:900">Wellness Score Trend (Last 6 months)</div>
+              <div style="font-size:12px;color:var(--muted)"><span style="color:#0a8c5b">●</span> Actual &nbsp; <span style="color:#9aa0a0">●</span> Target</div>
+            </div>
+            <div class="chart-placeholder" aria-hidden>[ chart placeholder ]</div>
+            <div style="margin-top:10px;color:var(--accent);font-weight:800">Great progress! You're 3 points above your target this month.</div>
+          </div>
+        </div>
+
+        <!-- vitals -->
+        <div>
+          <div class="section-title">Health Vitals Overview</div>
+          <div class="vitals">
+            <div class="vital">
+              <div class="ring" data-value="75" data-color="#1fae6d" aria-hidden>
+                <svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.5" stroke="#e6f7ef" stroke-width="3.5" fill="none"></circle><circle class="progress" cx="18" cy="18" r="15.5" stroke-width="3.5" stroke-linecap="round" stroke="#1fae6d" fill="none" stroke-dasharray="0 1000"></circle></svg>
+                <div class="value"><span class="val">75</span><small style="font-size:10px">%</small></div>
+              </div>
+              <div class="vital-info">
+                <div class="vital-label">Blood Pressure</div>
+                <div class="vital-sub">Resting rate • 120/80</div>
+              </div>
+            </div>
+
+            <div class="vital">
+              <div class="ring" data-value="85" data-color="#3a78f1" aria-hidden>
+                <svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.5" stroke="#e9f0ff" stroke-width="3.5" fill="none"></circle><circle class="progress" cx="18" cy="18" r="15.5" stroke-width="3.5" stroke-linecap="round" stroke="#3a78f1" fill="none" stroke-dasharray="0 1000"></circle></svg>
+                <div class="value"><span class="val">85</span><small style="font-size:10px">%</small></div>
+              </div>
+              <div class="vital-info">
+                <div class="vital-label">Heart Rate</div>
+                <div class="vital-sub">Avg bpm • 72</div>
+              </div>
+            </div>
+
+            <div class="vital">
+              <div class="ring" data-value="70" data-color="#7c4bf0" aria-hidden>
+                <svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.5" stroke="#f0eaff" stroke-width="3.5" fill="none"></circle><circle class="progress" cx="18" cy="18" r="15.5" stroke-width="3.5" stroke-linecap="round" stroke="#7c4bf0" fill="none" stroke-dasharray="0 1000"></circle></svg>
+                <div class="value"><span class="val">70</span><small style="font-size:10px">%</small></div>
+              </div>
+              <div class="vital-info">
+                <div class="vital-label">Sleep Quality</div>
+                <div class="vital-sub">Last night • 6h 42m</div>
+              </div>
+            </div>
+
+            <div class="vital">
+              <div class="ring" data-value="45" data-color="#ef5a56" aria-hidden>
+                <svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.5" stroke="#fdecec" stroke-width="3.5" fill="none"></circle><circle class="progress" cx="18" cy="18" r="15.5" stroke-width="3.5" stroke-linecap="round" stroke="#ef5a56" fill="none" stroke-dasharray="0 1000"></circle></svg>
+                <div class="value"><span class="val">45</span><small style="font-size:10px">%</small></div>
+              </div>
+              <div class="vital-info">
+                <div class="vital-label">Stress Level</div>
+                <div class="vital-sub">Today • Moderate</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- upcoming -->
+        <div>
+          <div class="section-title">Upcoming Appointments</div>
+          <div class="appt-row" role="article">
+            <div style="font-size:20px">⏰</div>
+            <div class="meta">
+              <div style="font-weight:900">Dr. Priya Sharma</div>
+              <div style="color:var(--muted);margin-top:6px">Today, 2:30 PM</div>
+            </div>
+            <div class="appt-tag">Consultation</div>
+          </div>
+        </div>
+
+        <!-- recommended -->
+        <div style="margin-top:8px; display:flex; justify-content:space-between; align-items:center">
+          <div class="section-title" style="margin:0">Recommended for You</div>
+          <a href="book.html" style="color:var(--accent); font-weight:900; text-decoration:none">View All</a>
+        </div>
+
+        <div class="recommended">
+          <div class="reco">
+            <div style="display:flex;gap:10px;align-items:center">
+              <div class="thumb">A</div>
+              <div>
+                <div style="font-weight:900">Abhyanga Massage</div>
+                <div style="color:var(--muted);font-size:12px;margin-top:6px">🕒 60 min • ⭐ 4.8</div>
+              </div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-weight:900;color:var(--muted)">$120</div>
+              <div style="margin-top:8px"><button class="book-btn" onclick="location.href='book.html'">Book</button></div>
+            </div>
+          </div>
+
+          <div class="reco">
+            <div style="display:flex;gap:10px;align-items:center">
+              <div class="thumb">S</div>
+              <div>
+                <div style="font-weight:900">Shirodhara Therapy</div>
+                <div style="color:var(--muted);font-size:12px;margin-top:6px">🕒 45 min • ⭐ 4.9</div>
+              </div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-weight:900;color:var(--muted)">$150</div>
+              <div style="margin-top:8px"><button class="book-btn" onclick="location.href='book.html'">Book</button></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- tip -->
+        <div class="tip" role="note">
+          <strong>Today's Wellness Tip</strong>
+          <div style="margin-top:6px;font-size:14px">Start your day with warm water and lemon to boost digestion.</div>
+        </div>
+
+        <div style="height:18px"></div>
+      </div>
+
+      <!-- bottom nav -->
+      <div class="bottom" aria-hidden="true">
+        <div class="nav" role="navigation">
+          <a href="home.html" class="active">🏠<br/>Home</a>
+          <a href="book.html">📅<br/>Book</a>
+          <a href="therapy.html">📚<br/>Therapy</a>
+          <a href="profile.html">👤<br/>Profile</a>
+          <a href="history.html">📜<br/>History</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // animate rings and fill values
+  document.addEventListener('DOMContentLoaded', ()=> {
+    const rings = document.querySelectorAll('.ring');
+    rings.forEach((r, idx) => {
+      const pct = Math.max(0, Math.min(100, Number(r.dataset.value || r.getAttribute('data-value') || 0)));
+      const color = r.dataset.color || r.getAttribute('data-color') || '#08b77f';
+      const c = r.querySelector('circle.progress');
+      const radius = 15.5;
+      const circumference = 2 * Math.PI * radius;
+      // configure stroke
+      c.style.stroke = color;
+      c.style.strokeDasharray = `${circumference} ${circumference}`;
+      // start hidden
+      c.style.strokeDashoffset = circumference;
+      // animate to value
+      setTimeout(()=> {
+        const offset = circumference - (pct / 100) * circumference;
+        c.style.transition = 'stroke-dashoffset 900ms cubic-bezier(.2,.9,.3,1)';
+        c.style.strokeDashoffset = offset;
+      }, 80 + idx * 80);
+      // set numeric label
+      const v = r.querySelector('.val');
+      if (v) v.textContent = pct;
+    });
+
+    // localStorage user name handling (optional)
+    try {
+      const saved = JSON.parse(localStorage.getItem('ayur_user') || '{}');
+      if (saved && saved.name) {
+        const first = saved.name.split(' ')[0];
+        document.getElementById('userName').textContent = first;
+        document.getElementById('avatar').textContent = first.charAt(0).toUpperCase();
+      }
+    } catch(e){ /* ignore */ }
+  });
+</script>
+</body>
+</html>
